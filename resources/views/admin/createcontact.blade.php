@@ -18,7 +18,7 @@
         @endforeach
         </ul>
     </div>
-@endif
+@endif 
                     <div class="form-group row">
                             <label for="type" class="col-md-4 col-form-label text-md-right">{{ __('Client') }}</label>
 
