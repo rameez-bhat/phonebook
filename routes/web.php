@@ -22,7 +22,7 @@ Route::post('/register','RegistrationController@register');
 //Route::get('register','commonController\UserController@registration')->name('register');
 Route::group(['middleware' => 'auth'], function ($user) {
     /****** Admin Routes */
-Route::get('admin/dashboard','commonController\UserController@adminDashboard')->name('adminDashboard');
+Route::get('admin/dashboard/{viewType?}','commonController\UserController@adminDashboard')->name('adminDashboard');
 Route::get('admin/edit/{id}','commonController\UserController@adminEditCustomer')->name('adminEditCustomer');
 Route::get('admin/create','commonController\UserController@adminCreateCustomer')->name('adminCreateCustomer');
 Route::post('admin/update/{user}','commonController\UserController@postAdminUpdateCustomer')->name('postAdminUpdateCustomer');

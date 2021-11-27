@@ -30,16 +30,48 @@ class UserController extends Controller
         }
         return redirect($redirect);
     }
-    public function adminDashboard()
+    public function CreateAdminChart($viewType)
     {
+        if($viewType=="Daily")
+        {
+            $data = Contact::select(\DB::raw("COUNT(*) as count"), \DB::raw("DAYNAME(created_at) as month_name"),\DB::raw('max(created_at) as createdAt'))
+            ->groupBy('month_name')
+            ->orderBy('createdAt')
+            ->get();
+        }
+        else if($viewType=="Weekly")
+        {
+            $data = Contact::select(\DB::raw("COUNT(*) as count"), \DB::raw("MONTHNAME(created_at) as month_name"),\DB::raw('max(created_at) as createdAt'))
+            ->groupBy('month_name')
+            ->orderBy('createdAt')
+            ->get();
+        }
+        else 
+        {
+            $data = Contact::select(\DB::raw("COUNT(*) as count"), \DB::raw("MONTHNAME(created_at) as month_name"),\DB::raw('max(created_at) as createdAt'))
+        ->groupBy('month_name')
+        ->orderBy('createdAt')
+        ->get(); 
+        }
+       
+        return $data;
+    }
+    public function adminDashboard($viewType="")
+    {
+           
+        if(trim($viewType)=="")
+        {
+            $viewType="Monthly";
+        }
+        elseif($viewType!="Monthly" && $viewType!="Weekly" && $viewType!="Daily")
+        {
+            $viewType="Monthly";
+        }
         $this->CheckifAdmin();
-        $ViewContactsCount = Contact::select(\DB::raw("COUNT(*) as count"))
-    ->groupBy(\DB::raw("Month(created_at)"))
-    ->pluck('count');
-        dd($ViewContactsCount);exit;
+        $GraphData=$this->CreateAdminChart($viewType);
         $data = User::where("type","user")->paginate(5);
     
-        return view('admin.dashboard',compact('data'))
+        return view('admin.dashboard',compact(['data','GraphData','viewType']))
             ->with('i', (request()->input('page', 1) - 1) * 5);
     }
     public function adminDashboardViewCustomerContacts($id)
