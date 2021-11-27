@@ -33,6 +33,10 @@ class UserController extends Controller
     public function adminDashboard()
     {
         $this->CheckifAdmin();
+        $ViewContactsCount = Contact::select(\DB::raw("COUNT(*) as count"))
+    ->groupBy(\DB::raw("Month(created_at)"))
+    ->pluck('count');
+        dd($ViewContactsCount);exit;
         $data = User::where("type","user")->paginate(5);
     
         return view('admin.dashboard',compact('data'))
@@ -70,7 +74,7 @@ class UserController extends Controller
         $user=User::find($userid);
         $user->name = request('name');
         $user->email = request('email');
-        $user->password = bcrypt(request('password'));
+        $user->password = Hash::make(request('password'));
 
         $user->save();
 
