@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
 
 class RegisterController extends Controller
 {
@@ -28,7 +29,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/customer/dashboard';
 
     /**
      * Create a new controller instance.
@@ -68,6 +69,25 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'type' => $data['type']
         ]);
+    }
+    public function register(Request $request) {
+        $rules = [
+            'name' => 'required|max:250',
+            'email' => 'required|email',
+            'password' => 'required|min:8',
+            'type'=> 'required'
+        ];
+        $validator = $this->validator($request->all(),$rules);
+
+     if ($validator->fails()) {
+        // print_r($validator->messages()->getMessages());
+        // echo "here";exit;
+         //return redirect($this->redirectPath())->withErrors($this->$validator)->withInput();
+        return back()->withErrors($validator->messages()->getMessages())->withInput();
+     }
+     $this->create($request->all());
+     return redirect($this->redirectPath());
     }
 }

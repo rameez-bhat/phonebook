@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\User;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-
+use Illuminate\Http\Request;
 class LoginController extends Controller
 {
     /*
@@ -19,13 +22,22 @@ class LoginController extends Controller
     */
 
     use AuthenticatesUsers;
-
+    protected function authenticated(Request $request, $user)
+    {
+    if ( $user->type=="superAdmin" || $user->type=="admin" ) {// do your magic here
+        return redirect()->route('adminDashboard');
+    }
+    else
+    {
+        return redirect()->route('customerDashboard');
+    }
+}
     /**
      * Where to redirect users after login.
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/dashboard';
 
     /**
      * Create a new controller instance.
@@ -36,4 +48,16 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+    public function logout(Request $request)
+    {
+        Session::flush();
+        $redirect="customer/login";
+        if(Auth::check() && Auth::isAdmin())
+        {
+            $redirect="admin/login";
+        }
+        Auth::logout();
+        return redirect($redirect);
+    }
+
 }
